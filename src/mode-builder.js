@@ -155,7 +155,7 @@ var BuilderHighlightRules = function() {
 	"iTitle","iTrim","iTW","iUnHex","iUpper","iUrlEncode","iUse"];
 
     const brace_i = /\{(?!\|)/;
-    const brace_o = /(?<!\|)\}/;
+    const brace_o = /(?:(?!\|\})[^\0])\}/;
     const literal_i = /\{\|/;
     const literal_o = /\|\}/;
     const literal_c = /[^|]|\|[^}]+/m;
