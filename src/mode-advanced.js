@@ -139,7 +139,7 @@ var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 
-var BuilderHighlightRules = function() {
+var AdvancedHighlightRules = function() {
 	var internals = ["iAppend","iBase64","iBirth","iBuildMeta","iConsole",
 	"iContent","iDate","iDeath","iDecode","iDigest","iEmbed","iEncode","iEq",
 	"iEqFamily","iEqNode","iEqSibs","iEval","iExistContent","iExistMedia",
@@ -392,9 +392,9 @@ var BuilderHighlightRules = function() {
 	this.normalizeRules();
 };
 
-oop.inherits(BuilderHighlightRules, TextHighlightRules);
+oop.inherits(AdvancedHighlightRules, TextHighlightRules);
 
-exports.BuilderHighlightRules = BuilderHighlightRules;
+exports.AdvancedHighlightRules = AdvancedHighlightRules;
 });
 
 define("ace/mode/advanced",["require","exports","module","ace/lib/oop","ace/mode/text","ace/tokenizer","ace/mode/matching_brace_outdent","ace/mode/behaviour/css","ace/mode/advanced_highlight_rules","ace/range"], function(require, exports, module) {
