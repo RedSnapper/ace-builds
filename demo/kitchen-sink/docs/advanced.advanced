@@ -1,0 +1,100 @@
+Normal macro 
+⌽test(ddd,ddd,ddffddff)
+
+Invalid
+⌽
+
+No Params
+⌽test()
+
+Comment
+⌽comment(dddd)
+
+Internal Macro
+⌽iLink(ddd,ddd)
+
+Markup macro
+⌽wLi(,)
+
+//numbered parms
+⍟312
+⍟(3)
+⍟(3+)
+
+//repeated macro
+⍟(k) (number in a repeated macro)
+⍟(j) (parm+1 in a repeated macro)
+⍟(n) (number of parms in a repeated macro)
+⍟(i) (current parm in a repeated macro)
+
+//stack pointer
+⍟0      //name of self  
+⍟(p)    //name of caller
+⍟(p0)   // ditto
+⍟(p1)   //name of caller's caller
+⍟(ps)   //stack (semicolon delimited)
+
+Braces
+⎡braces⎤
+
+Macro With brackets
+⌽test(ddd,ddd,dd(ffddff))
+
+
+Macro with braces
+⌽test(ddd,ddd⎡dd,d⎤)
+
+Macro with everything
+⌽test(dd,⎡dd,dd⎤,⌽test(ddd),(dddd),⌽test❪ddd,ddd,ddd❫)
+
+Macro multiline
+
+⌽test(dd,
+    ⌽test❪ssss❫,
+	⎡dd,dd⎤,
+	⎡|ddd|⎤,
+	⌽test(ddd),
+	(dddd),
+⌽)
+
+Bracket matching
+⌽iRegex((()))
+
+Double Brackets
+----------------------
+
+Normal macro
+⌽test❪ddd,ddd,ddd❫
+
+No Params
+⌽test❪❫
+
+Comment
+⌽comment❪dddd❫
+
+Internal Macro
+⌽iLink❪ddd,ddd❫
+
+Markup macro
+⌽wLi❪,❫
+
+Macro With brackets
+⌽test❪a)))),ddd,())))❫
+
+Macro with braces
+⌽test❪ddd,ddd⎡dd,d⎤❫
+
+Macro with everything
+⌽test❪dd,⎡dd,dd⎤,⌽test(ddd),(dddd),⌽❫
+
+Macro multiline
+
+⌽test❪dd,
+	⎡dd,dd⎤,
+	⎡|ddd|⎤,
+	⌽test(ddd),
+	(dddd),
+⌽❫
+
+
+
