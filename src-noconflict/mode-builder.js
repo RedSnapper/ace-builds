@@ -155,30 +155,37 @@ var BuilderHighlightRules = function() {
 	"iTitle","iTrim","iTW","iUnHex","iUpper","iUrlEncode","iUse"];
 
     const brace_i = /\{(?!\|)/;
-    const brace_o = /(?:(?!\|\})[^\0])\}/;
-    const literal_i = /\{\|/;
+    const brace_o = /\}/;
+    const literal_i = /\{\|(?!\})/;
     const literal_o = /\|\}/;
-    const literal_c = /[^|]|\|[^}]+/m;
+    const literal_c = /[^\|@]|(\|[^}])+|@(?!comment\()?/m;
     const comment_c = /[^()]+/m;
     const bracket_i = /\(/;
     const bracket_o = /\)/;
     const mt_tag = /^w[A-Z0-9]/;
     const mt_xml = /^w[a-z0-9]/;
     const inject = /%\^*([0-9]+|\([0-9]+\+?\)|[ijknK]([./+-][0-9]+)?|\([ijknK]([./+-][0-9]+)?\)|\(p([s]|[0-9]+)?\))/;
+    const macro_inst = /@(\w+)\(/;
+    const comment_inst = /@comment\(/;
+    const comma = /,/;
 
 	var comment_count = 0;
 	var literal_count = 0;
 	
 
 	var macro = {
-		regex: /@(\w+)\(/,
+		regex: macro_inst,
 		push: "macro",
 		token: function (value) {
 			if(value == "comment") {
 			    this.push = "comment";
 				this.nextState = "comment";
-			    comment_count = 0;
-				return "storage";
+			    comment_count++;
+    		    var result = "comment.documentation";
+    		    if (comment_count == 1) {
+    				result = "storage";
+    		    }
+    			return result;
 			} else {
     			this.nextState = "macro";
      			var tag = mt_tag;
@@ -199,18 +206,13 @@ var BuilderHighlightRules = function() {
 			}
 		},
 	},
-	brace = {
-		regex: brace_i,
-		token: "support.type",
-		push: "brace"
-	},
 	mbrace = {
 		regex : brace_i,
 		token: "variable.parameter",
 		push: "mbrace"
 	},
 	mcomma = {
-		regex: /,/,
+		regex: comma,
 		onMatch: function(value,state,stack) {
 			var retval;
 			switch(state) {
@@ -231,24 +233,34 @@ var BuilderHighlightRules = function() {
 	    regex : inject,  //%i or %(j.4) 
 		token: "constant"
 	},
+	comment = {
+		regex: comment_inst,
+		token: function (value) {
+		    var result = "comment.documentation";
+		    if (comment_count == 0) {
+				result = "storage";
+		    }
+		    comment_count++;
+			return result;
+ 		},
+ 		push: "comment"
+	},
 	literal = {
 		regex: literal_i,
+		push: "literal",
 		token: function (value) {
-		    var result = "support.constant";
+		    var result = "support.function";
 		    if (literal_count == 0) {
-		       result = "support.class"; 
+				result = "support.class";
 		    }
 		    literal_count++;
 			return result;
- 		},
-		push: "literal",
-		next: "literal"
-	};
-	
-	
+ 		}
+ 	};
 
-	var defaultRules = [macro,literal,brace,injection];
-	var macroRules = [defaultRules,mcomma,mbrace,mbracket];
+	var defaultRules = [macro,literal,injection,comment];
+	var mbraceRules = [defaultRules,mbrace,mbracket];
+	var macroRules = [mbraceRules,mcomma];
 
 	this.$rules = {
 		"start" : [
@@ -301,7 +313,6 @@ var BuilderHighlightRules = function() {
 		"bracket": [
 			defaultRules,
 			mbracket,
-			brace,
 			{
 				regex : bracket_o,
 				token: "variable",
@@ -311,41 +322,44 @@ var BuilderHighlightRules = function() {
 				defaultToken: "variable"
 			}
 		],
-		
-		"brace": [
-			defaultRules,
-			brace,
-			{
+		"mbrace": [
+			mbraceRules,
+            {
 				regex : brace_o,
-				token: "support.type",
+				token: "variable.parameter",
 				next: "pop"
 			},{
-				defaultToken: "support.type"
+				defaultToken: "variable.parameter"
 			}
 		],
-
-		
 		"comment": [
-			{
-        		regex: bracket_i,
-        		token: function (value) {
-    			    comment_count++;
-        			return "comment.documentation";
-         		},
-         		push: "comment"
-			},
+		    comment,
+            {
+            		regex: bracket_i,
+            		token: function (value) {
+            		    var result = "comment.documentation";
+            		    if (comment_count == 0) {
+            				result = "storage";
+            		    }
+            		    comment_count++;
+            			return result;
+             		},
+             		push: "comment"
+	        },		    
 			{
         		regex: bracket_o,
-        		token: function (value) {
-        		    var result = "comment.documentation";
-    			    if (comment_count == 0) {
-        				result = "storage";
+         		next: "pop",
+       		    token: function (value) {
+    			    if (comment_count > 0) {
+    			        comment_count--;
     			    }
-    			    comment_count--;
+        		    var result = "comment.documentation";
+        		    if (comment_count == 0) {
+        				result = "storage";
+        		    }
         			return result;
-         		},
-         		next: "pop"
-			},
+         		}
+ 			},
 			{
         		regex: comment_c,
         		token: "comment.documentation"
@@ -355,36 +369,28 @@ var BuilderHighlightRules = function() {
 			}
 		],
 
-		
 		"literal": [
+		    comment,literal,
 			{
         		regex: literal_o,
         		token: function (value) {
-        		    var result = "support.constant";
-    			    if (literal_count == 1) {
+    			    if (literal_count > 0) {
+    			        literal_count--;
+   			        }
+        		    var result = "support.function";
+    			    if (literal_count == 0) {
         				result = "support.class";
     			    }
-    			    literal_count--;
-        			return result;
+         			return result;
          		},
          		next: "pop"
 			},
 			{
-			   regex: /@comment\(/,
-        	   token: function (value) {
-        	      comment_count = 0;
-        	      return "storage";
-        	   },
-			   push: "comment",
-			   nextState: "comment"
-			},
-			{
         		regex: literal_c,
         		token: "support.function",
-         		next: "literal"
 			},
 			{
-				defaultToken: "support.constant"
+				defaultToken: "support.function"
 			}
 		],
 	};
@@ -392,7 +398,6 @@ var BuilderHighlightRules = function() {
 };
 
 oop.inherits(BuilderHighlightRules, TextHighlightRules);
-
 exports.BuilderHighlightRules = BuilderHighlightRules;
 });
 
