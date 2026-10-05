@@ -1,7 +1,9 @@
-ace.define("ace/snippets/advanced",["require","exports","module"], function(require, exports, module) {
-"use strict";
+ace.define("ace/snippets/advanced.snippets",["require","exports","module"], function(require, exports, module){module.exports = "";
 
-exports.snippetText =undefined;
+});
+
+ace.define("ace/snippets/advanced",["require","exports","module","ace/snippets/advanced.snippets"], function(require, exports, module){"use strict";
+exports.snippetText = require("./advanced.snippets");
 exports.scope = "advanced";
 
 });                (function() {

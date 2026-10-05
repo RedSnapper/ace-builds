@@ -1,4 +1,4 @@
-define("ace/snippets/advanced",["require","exports","module"],function(e,t,n){"use strict";t.snippetText=undefined,t.scope="advanced"});                (function() {
+define("ace/snippets/advanced.snippets",["require","exports","module"],function(e,t,n){n.exports=""}),define("ace/snippets/advanced",["require","exports","module","ace/snippets/advanced.snippets"],function(e,t,n){"use strict";t.snippetText=e("./advanced.snippets"),t.scope="advanced"});                (function() {
                     window.require(["ace/snippets/advanced"], function(m) {
                         if (typeof module == "object" && typeof exports == "object" && module) {
                             module.exports = m;
